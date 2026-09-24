@@ -47,9 +47,15 @@ class DisclosureItem(_Model):
 
     For earnings calls the item to look for is ``kind="facts"`` with
     ``source="earnings_call"``: its ``content`` is the ten-sentence summary whose
-    provenance is documented in :mod:`examples.summary`. Both fields are open
-    string sets, like ``event_type`` — new kinds and sources can appear without
-    breaking parsing, so match on them rather than assuming a single item.
+    provenance is documented in :mod:`examples.summary`. A second item,
+    ``id="earnings-preview"`` (``kind="text"``, ``source="claude_code_web_research"``,
+    ``media_type="text/markdown"``), carries an agent-written pre-release research
+    note as ONE markdown string; it may be absent, and :mod:`examples.preview`
+    documents where it comes from. ``content``'s JSON type follows
+    ``kind`` (``facts`` → list of strings, ``text`` → string). All of these are
+    open string sets, like ``event_type`` — new kinds and sources can appear
+    without breaking parsing, so match on them rather than assuming a single
+    item or a position.
 
     Larger or binary artifacts are referenced rather than inlined, via
     ``media_type`` / ``url`` / ``bytes`` / ``sha256``.
@@ -58,7 +64,7 @@ class DisclosureItem(_Model):
     id: str | None = None
     kind: str
     source: str | None = None
-    content: list[str] = []
+    content: list[str] | str | None = None
     media_type: str | None = None
     url: str | None = None
     bytes: int | None = None

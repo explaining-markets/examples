@@ -377,10 +377,14 @@ def facts_from_disclosure(record: dict) -> list[str]:
     a call whose summarization failed, legitimately has none.
 
     ``record`` is a raw archive line (as yielded by
-    :func:`examples.archive.read_jsonl_gz`) or an equivalent event payload.
+    :func:`examples.archive.read_jsonl_gz`), an equivalent event payload, or a
+    ``load_archive`` row as a dict (where a missing ``disclosure`` is ``NaN``, not
+    ``None`` — hence the type checks). The second disclosure item, the earnings
+    preview, has its own reader in :mod:`examples.preview`.
     """
-    items = (record.get("disclosure") or {}).get("items") or []
-    for item in items:
+    disclosure = record.get("disclosure")
+    items = disclosure.get("items") if isinstance(disclosure, dict) else None
+    for item in items if isinstance(items, list) else []:
         if item.get("kind") == FACTS_KIND and item.get("source") == EARNINGS_CALL_SOURCE:
             return list(item.get("content") or [])
     return []

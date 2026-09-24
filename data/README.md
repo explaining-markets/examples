@@ -16,6 +16,14 @@ Just enough data for the notebooks to run top-to-bottom **without an API key**
   documented event payload with an inlined disclosure (`facts`). It is a
   **stand-in for exposition** — the real archive is served by the API and its
   lines may include additional fields. Treat the API as the source of truth.
+- `archive_EARNINGS_RELEASE_2026Q3.jsonl.gz` — six **real** archive lines (NVDA,
+  WMT, HD, CRM, AVGO, ORCL), copied verbatim from the live 2026Q3 file on
+  2026-09-24. Each carries both disclosure items — the ten facts and the
+  agent-written **earnings preview** — plus the realized `event_returns`,
+  `metrics`, and `knowledge_cutoff` the archive adds once an event is scored, so
+  `notebooks/03_earnings_previews.ipynb` and the preview section of notebook 01
+  run offline on genuine content. 2026Q3 was unsealed when this was pulled, so
+  fields may later change upstream; the API remains the source of truth.
 - `transcript_sample.json` — a **synthetic** earnings-call transcript for a
   fictional company (Northwind Logistics). Real transcripts are licensed and are
   not distributed with this repo; this one exists so

@@ -13,7 +13,7 @@ from examples.archive import download_archive, load_archive, read_jsonl_gz
 from examples.client import Client
 from examples.config import Config
 from examples.schemas import ArchiveManifest
-from tests.conftest import SAMPLE_ARCHIVE, TEST_BASE_URL
+from tests.conftest import SAMPLE_ARCHIVE, SAMPLE_DIR, TEST_BASE_URL
 
 
 def _gz_bytes(records: list[dict]) -> bytes:
@@ -37,6 +37,17 @@ def test_load_archive_adds_provenance_from_filename() -> None:
     assert len(df) == 5
     assert set(df["quarter"]) == {"2025Q3"}
     assert set(df["event_type"]) == {"EARNINGS_RELEASE"}
+
+
+def test_load_archive_directory_concatenates_both_samples() -> None:
+    # The synthetic 2025Q3 file and the real 2026Q3 file differ in columns; the
+    # union is taken and the missing cells are NaN.
+    df = load_archive(SAMPLE_DIR)
+    assert len(df) == 11
+    assert set(df["quarter"]) == {"2025Q3", "2026Q3"}
+    assert set(df["event_type"]) == {"EARNINGS_RELEASE"}
+    assert df.loc[df["quarter"] == "2025Q3", "event_returns"].isna().all()
+    assert df.loc[df["quarter"] == "2026Q3", "event_returns"].notna().all()
 
 
 def test_load_archive_empty_dir(tmp_path: Path) -> None:

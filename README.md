@@ -7,7 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Notebook examples for exploring the [Explaining Markets](https://explainingmarkets.ai/)
-competition API and its historical data archive. Notebook-first, with the repeated
+competition API and its historical data archive — including the two disclosure items
+each earnings event carries, the ten call facts and (from 2026Q3) the earnings
+preview. Notebook-first, with the repeated
 API / parsing / plotting boilerplate factored into a small `examples` package so the
 notebooks stay short and readable.
 
@@ -18,8 +20,9 @@ notebooks stay short and readable.
 | [`notebooks/00_api_quickstart.ipynb`](notebooks/00_api_quickstart.ipynb) | The read endpoints — events calendar (table + chart), submission health, archive manifest, webhook self-test |
 | [`notebooks/01_historical_archive.ipynb`](notebooks/01_historical_archive.ipynb) | Download, cache, and load the historical archive, then reproduce the baseline scoring regressions (Koijen & Levy WP, Table 3) with the competition's exact scoring transform |
 | [`notebooks/02_earnings_call_facts.ipynb`](notebooks/02_earnings_call_facts.ipynb) | Where each event's ten-fact `disclosure` comes from — the exact prompt, model config, and parsing behind it, and how extraction failures surface |
+| [`notebooks/03_earnings_previews.ipynb`](notebooks/03_earnings_previews.ipynb) | The **earnings preview** — the agent-written pre-release research note that recent events carry as a second disclosure item: how it is built (at a high level), what it looks like, and how it pairs with the facts and the realized reaction |
 
-All three run top-to-bottom. With an API key they hit the live API; **without one they
+All four run top-to-bottom. With an API key they hit the live API; **without one they
 fall back to a small bundled sample** (`data/sample/`), so you can run them — and CI
 can execute them — with no credentials.
 
@@ -60,7 +63,7 @@ events_frame(events).head()
 
 ```text
 notebooks/   the numbered, narrative examples
-src/examples/  helper package: config · client · schemas · frames · plotting · archive · scoring · summary
+src/examples/  helper package: config · client · schemas · frames · plotting · archive · scoring · summary · preview
 scripts/     small runnable scripts (e.g. headless archive download)
 tests/       offline unit tests (mocked HTTP + bundled sample data)
 data/
