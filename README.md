@@ -20,7 +20,7 @@ notebooks stay short and readable.
 | [`notebooks/00_api_quickstart.ipynb`](notebooks/00_api_quickstart.ipynb) | The read endpoints — events calendar (table + chart), submission health, archive manifest, webhook self-test |
 | [`notebooks/01_historical_archive.ipynb`](notebooks/01_historical_archive.ipynb) | Download, cache, and load the historical archive, then reproduce the baseline scoring regressions (Koijen & Levy WP, Table 3) with the competition's exact scoring transform |
 | [`notebooks/02_earnings_call_facts.ipynb`](notebooks/02_earnings_call_facts.ipynb) | Where each event's ten-fact `disclosure` comes from — the exact prompt, model config, and parsing behind it, and how extraction failures surface |
-| [`notebooks/03_earnings_previews.ipynb`](notebooks/03_earnings_previews.ipynb) | The **earnings preview** — the agent-written pre-release research note that recent events carry as a second disclosure item: how it is built (at a high level), what it looks like, and how it pairs with the facts and the realized reaction |
+| [`notebooks/03_earnings_previews.ipynb`](notebooks/03_earnings_previews.ipynb) | The **earnings preview** — the result of running [Anthropic's Earnings Preview Skill](https://github.com/anthropics/financial-services/blob/main/plugins/agent-plugins/earnings-reviewer/skills/earnings-preview/SKILL.md) prior to each earnings announcement. Starting Q4 2026, events carry this as a second disclosure item. The notebook covers how it is built, what it looks like, and how it pairs with the facts |
 
 All four run top-to-bottom. With an API key they hit the live API; **without one they
 fall back to a small bundled sample** (`data/sample/`), so you can run them — and CI
