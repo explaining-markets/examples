@@ -360,3 +360,10 @@ def test_sample_summary_matches_the_published_artifact_shape() -> None:
     recovered, note = recover_facts(json.dumps({"facts": facts}))
     assert recovered == facts
     assert note == "strict"
+
+
+def test_facts_from_disclosure_tolerates_nan_disclosure() -> None:
+    # A load_archive row over mixed files carries float NaN, not None, where a
+    # record lacks the field.
+    assert facts_from_disclosure({"disclosure": float("nan")}) == []
+    assert facts_from_disclosure({"disclosure": {"items": float("nan")}}) == []
