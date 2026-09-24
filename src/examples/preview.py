@@ -9,10 +9,11 @@ ante expectation about the announcement. It is optional: events from before it w
 disseminated, and events for which no preview was produced, legitimately have none.
 
 How it is built, at a high level: the competition runs Anthropic's open
-``earnings-reviewer`` plugin — specifically its ``earnings-preview`` skill — through
-Claude Code, pinned to a fixed commit of :data:`PREVIEW_PLUGIN_REPO`. The agent gets a
-one-line request naming the company, ticker, fiscal period and scheduled event time,
-and only web search / fetch as tools. No transcript, no consensus feed and no
+``earnings-reviewer`` plugin — specifically its ``earnings-preview`` skill —
+programmatically in a sandbox where Claude has the standard Claude Code harness,
+pinned to a fixed commit of :data:`PREVIEW_PLUGIN_REPO`. The agent gets a one-line
+request naming the company, ticker, fiscal period and scheduled event time and
+researches the rest on the public web. No transcript, no consensus feed and no
 competition data are injected; whatever the note knows, it found and cited itself.
 The skill prescribes the note's shape (consensus estimates, key metrics to watch,
 bull/base/bear scenarios, a catalyst checklist and the trading setup), and the ``##``
