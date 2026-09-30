@@ -14,6 +14,8 @@ running in a deployed webhook handler, not to these examples.
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -51,11 +53,19 @@ class DisclosureItem(_Model):
     ``id="earnings-preview"`` (``kind="text"``, ``source="claude_code_web_research"``,
     ``media_type="text/markdown"``), carries an agent-written pre-release research
     note as ONE markdown string; it may be absent, and :mod:`examples.preview`
-    documents where it comes from. ``content``'s JSON type follows
-    ``kind`` (``facts`` → list of strings, ``text`` → string). All of these are
-    open string sets, like ``event_type`` — new kinds and sources can appear
-    without breaking parsing, so match on them rather than assuming a single
-    item or a position.
+    documents where it comes from. A third item, ``id="option-implied-stats"``
+    (``kind="stats"``, ``source="option_market"``, ``media_type="application/json"``),
+    carries three option-market statistics as an OBJECT; it may be absent too, and
+    :mod:`examples.option_stats` documents it. ``content``'s JSON type follows
+    ``kind`` (``facts`` → list of strings, ``text`` → string, ``stats`` → object).
+    All of these are open string sets, like ``event_type`` — new kinds and sources
+    can appear without breaking parsing, so match on them rather than assuming a
+    single item or a position.
+
+    ``content`` is typed ``Any`` for the same reason: a new ``kind`` can bring a
+    JSON type this model has never seen, and a narrower annotation would reject
+    the WHOLE bundle over one item nobody asked for. (It was ``list[str] | str``
+    until the ``stats`` kind arrived and did exactly that.)
 
     Larger or binary artifacts are referenced rather than inlined, via
     ``media_type`` / ``url`` / ``bytes`` / ``sha256``.
@@ -64,7 +74,7 @@ class DisclosureItem(_Model):
     id: str | None = None
     kind: str
     source: str | None = None
-    content: list[str] | str | None = None
+    content: Any = None
     media_type: str | None = None
     url: str | None = None
     bytes: int | None = None
