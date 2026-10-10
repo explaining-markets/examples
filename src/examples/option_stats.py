@@ -47,6 +47,12 @@ Coverage: the item is absent when a stock has no listed options or they trade to
 thinly to measure, which is most smaller companies. Fewer than half of 2026Q3 events
 carry it. The skew can be unavailable on its own when only the out-of-the-money
 options are thin. Events before 2026Q3 never carry the item.
+
+Using the move: the competition's score is invariant to any uniform affine remap of
+a submission's predictions (see :mod:`examples.scoring`), so a number that is the
+same for every event cannot change it. The implied move differs across events, and
+:func:`scale_by_implied_move` uses it to stretch or shrink each prediction's
+distance from the submission's own centre. Notebook 04 shows the effect.
 """
 
 from __future__ import annotations
@@ -157,3 +163,48 @@ def option_stats_frame(records: Iterable[dict]) -> pd.DataFrame:
             df[column] = pd.to_datetime(df[column], utc=True, format="ISO8601")
         df = df.sort_values("event_datetime").reset_index(drop=True)
     return df
+
+
+def scale_by_implied_move(
+    prediction: pd.Series,
+    move: pd.Series,
+    *,
+    pivot: float | None = None,
+    power: float = 0.5,
+) -> pd.Series:
+    """Rescale predicted percentiles event by event with the option-implied move.
+
+    Returns ``pivot + (prediction - pivot) * (move / move.mean()) ** power``, clipped
+    to ``[0, 1]`` and indexed like ``prediction``. ``move`` is aligned to
+    ``prediction`` by index label first, so pass two columns of the same frame or
+    two series sharing an index. An event with no move (``NaN``) keeps its
+    prediction unchanged, and if no event has a usable move the input comes back
+    as it is.
+
+    Why this shape: the competition scores how well predictions explain the
+    *percentile rank* of the one-day abnormal return. A rank cannot grow without
+    bound, so the effect of a larger expected magnitude saturates, and a
+    submission's own forecasts are rarely centred at 0.5. Hence the two defaults:
+
+    ``pivot=None``
+        Pivot at the submission's own mean prediction. Stretching away from 0.5
+        instead pushes every low-move event down and every high-move event up
+        whatever the model thought, which adds the move as a signed regressor the
+        data do not support.
+    ``power=0.5``
+        A square-root factor, so a move four times the average doubles the
+        deviation rather than quadrupling it. On 2026Q3 this parameter-free rule
+        captures essentially all of the gain a freely fitted interaction would.
+
+    ``pivot=0.5, power=1.0`` gives the "naive" rescale, ``0.5 + (p - 0.5) * m / mean(m)``,
+    which lowers the score for the reference baselines. The reference scale
+    ``move.mean()`` matters only through the clip: dividing by any other positive
+    constant is an affine remap, which the score ignores.
+    """
+    move = pd.to_numeric(move.reindex(prediction.index), errors="coerce").astype("float64")
+    reference = float(move.mean())
+    if not reference > 0:
+        return prediction.copy()
+    centre = float(prediction.mean()) if pivot is None else pivot
+    factor = (move / reference).pow(power).where(move.notna(), 1.0)
+    return (centre + (prediction - centre) * factor).clip(0.0, 1.0)

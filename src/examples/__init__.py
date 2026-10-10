@@ -14,6 +14,8 @@ Quick tour:
   scoring   — the competition's exact percentile scoring transform
   summary   — the exact 10-fact extraction behind each event's disclosure
   preview   — the agent-written earnings preview attached from 2026Q3 onward
+  option_stats — the option-implied statistics attached from 2026Q3 onward, and
+              the implied-move rescaling of a submission's predictions
 """
 
 from __future__ import annotations
