@@ -22,6 +22,7 @@ notebooks stay short and readable.
 | [`notebooks/01_historical_archive.ipynb`](notebooks/01_historical_archive.ipynb) | Download, cache, and load the historical archive, then reproduce the baseline scoring regressions (Koijen & Levy WP, Table 3) with the competition's exact scoring transform |
 | [`notebooks/02_earnings_call_facts.ipynb`](notebooks/02_earnings_call_facts.ipynb) | Where each event's ten-fact `disclosure` comes from — the exact prompt, model config, and parsing behind it, and how extraction failures surface |
 | [`notebooks/03_earnings_previews.ipynb`](notebooks/03_earnings_previews.ipynb) | The **earnings preview** — the result of running [Anthropic's Earnings Preview Skill](https://github.com/anthropics/financial-services/blob/main/plugins/agent-plugins/earnings-reviewer/skills/earnings-preview/SKILL.md) prior to each earnings announcement. Starting Q4 2026, events carry this as a second disclosure item. The notebook covers how it is built, what it looks like, and how it pairs with the facts |
+| [`notebooks/04_options_market_data.ipynb`](notebooks/04_options_market_data.ipynb) | The **option-implied statistics** — what the options market priced for each release, why the scorer is blind to a uniform rescaling of predictions, and how the implied move works as an *event-specific* scale for a prediction. Reproduces the effect on the two reference baselines with the exact scoring transform |
 
 ### The option-implied statistics
 
@@ -34,11 +35,11 @@ stats = option_implied_stats_from_disclosure(record)          # dict, or None wh
 move = statistic_value(stats, "implied_absolute_earnings_move")  # float, or None unless status is "ok"
 ```
 
-`examples.option_stats` documents what the three numbers mean and when they are missing. There is no notebook for it yet, and the bundled 2026Q3 sample predates the item, so run against the live archive to see it.
+`examples.option_stats` documents what the three numbers mean and when they are missing, and `scale_by_implied_move` turns the move into an event-specific rescaling of a submission's predictions. Notebook 04 walks through both; its regression sections need the live archive (the bundled sample carries the item on its six events but no baseline predictions).
 
 If you parse bundles with your own typed model, make sure an item's `content` accepts any JSON type. A model that allows only strings and lists of strings rejects the whole bundle, facts included, the first time it meets this item. `examples.schemas.DisclosureItem` had exactly that annotation until this release.
 
-All four run top-to-bottom. With an API key they hit the live API; **without one they
+All five run top-to-bottom. With an API key they hit the live API; **without one they
 fall back to a small bundled sample** (`data/sample/`), so you can run them — and CI
 can execute them — with no credentials.
 
